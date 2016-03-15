@@ -29,7 +29,7 @@ function registerUser()
     var pass = document.getElementById("pass").value;
     var type = document.getElementById("type").value;
 
-    var url = "/register?"
+    var url = "/web/register?"
     + "login=" + login + "&"
     + "type=" + type + "&"
     + "pass=" + pass + "&"

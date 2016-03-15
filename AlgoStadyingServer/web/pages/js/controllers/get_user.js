@@ -24,7 +24,7 @@ function getUser()
 {
     createGetUserRequest()
     var query = window.location.search.substring(1);
-    var url = "/get_user?" + query;
+    var url = "/web/get_user?" + query;
     request.onreadystatechange = handleGetUserResponse;
     request.open("POST", url, true);
     request.send(null);

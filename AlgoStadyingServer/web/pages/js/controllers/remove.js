@@ -23,7 +23,7 @@ function createRemove()
 function removeUser(id)
 {
     createRemove()
-    var url = "/remove?"
+    var url = "/web/remove?"
     + "id=" + id;
 
     console.log(url);

@@ -23,7 +23,7 @@ function createGetUsers()
 function getUsers()
 {
     createGetUsers()
-    var url = "/get_users";
+    var url = "/web/get_users";
     request.onreadystatechange = handleGetUsers;
     request.open("POST", url, true);
     request.send(null);
