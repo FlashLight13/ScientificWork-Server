@@ -21,10 +21,10 @@ public class TasksProcessor {
 	@Autowired
 	TasksController tasksController;
 
-	@RequestMapping(value = "/createOrUpdateWorld")
+	@RequestMapping(value = "/createTask")
 	public ResponseEntity<WorldData> createOrUpdateWorld(@RequestBody WorldData request) {
-		return new ResponseEntity<WorldData>(tasksController.createUpdateTask(request.task, request.taskGroup),
-				HttpStatus.OK);
+		return new ResponseEntity<WorldData>(
+				tasksController.createTask(request.task, request.taskGroup, request.userIds), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getTaskGroupsNames")
@@ -99,14 +99,16 @@ public class TasksProcessor {
 	public static final class WorldData {
 		public TaskGroup taskGroup;
 		public Task task;
+		public List<String> userIds;
 
 		public WorldData() {
 		}
 
-		public WorldData(TaskGroup taskGroup, Task task) {
+		public WorldData(TaskGroup taskGroup, Task task, List<String> userIds) {
 			super();
 			this.taskGroup = taskGroup;
 			this.task = task;
+			this.userIds = userIds;
 		}
 	}
 }

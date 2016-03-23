@@ -30,7 +30,7 @@ public class TasksController {
 	@Autowired
 	PlayerController playerController;
 
-	public WorldData createUpdateTask(Task task, TaskGroup taskGroup) {
+	public WorldData createTask(Task task, TaskGroup taskGroup, List<String> users) {
 		String[][][] gameField = task.getGameField();
 		task.setGameField(null);
 		task = taskRepository.save(task);
@@ -42,7 +42,7 @@ public class TasksController {
 		}
 		taskGroup.getTasks().add(task);
 		taskGroup = taskGroupRepository.save(taskGroup);
-		return new WorldData(taskGroup, task);
+		return new WorldData(taskGroup, task, users);
 	}
 
 	private TaskGroup prepareTaskGroupTaSave(TaskGroup taskGroup) {
