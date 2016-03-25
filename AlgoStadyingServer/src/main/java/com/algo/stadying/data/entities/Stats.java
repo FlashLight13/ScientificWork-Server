@@ -10,7 +10,7 @@ import javax.persistence.Table;
 @Table(name = "stats")
 public class Stats {
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String groupName;
 	private String taskName;

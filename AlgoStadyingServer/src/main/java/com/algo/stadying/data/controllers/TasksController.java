@@ -2,10 +2,7 @@ package com.algo.stadying.data.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,41 +26,21 @@ public class TasksController {
 	TaskGroupsRepository taskGroupRepository;
 	@Autowired
 	PlayerController playerController;
+	@Autowired
+	TaskCreationSubcontroller taskCreationSubcontroller;
 
 	public WorldData createTask(Task task, TaskGroup taskGroup, List<String> users) {
 		String[][][] gameField = task.getGameField();
 		task.setGameField(null);
 		task = taskRepository.save(task);
-		saveGameWorld(task.getId(), gameField);
+		taskCreationSubcontroller.saveGameWorld(task.getId(), gameField);
 
-		taskGroup = prepareTaskGroupTaSave(taskGroup);
-		if (taskGroup.getTasks() == null) {
-			taskGroup.setTasks(new ArrayList<Task>());
+		if (taskGroupRepository.exists(taskGroup.getId())) {
+			taskGroup = taskCreationSubcontroller.updateTaskGroup(taskGroup, task);
+		} else {
+			taskGroup = taskCreationSubcontroller.createTaskGroup(taskGroup, task);
 		}
-		taskGroup.getTasks().add(task);
-		taskGroup = taskGroupRepository.save(taskGroup);
 		return new WorldData(taskGroup, task, users);
-	}
-
-	private TaskGroup prepareTaskGroupTaSave(TaskGroup taskGroup) {
-		if (taskGroup.getId() != null && taskGroup.getId() > 0) {
-			TaskGroup existedGroup = taskGroupRepository.findOne(taskGroup.getId());
-			taskGroup.getTasks().addAll(existedGroup.getTasks());
-		}
-		return taskGroup;
-	}
-
-	private void saveGameWorld(long taskId, String[][][] gameWorld) {
-		ObjectOutputStream oos = null;
-		try {
-			oos = new ObjectOutputStream(new FileOutputStream(new File(String.valueOf(taskId))));
-			oos.writeObject(gameWorld);
-			oos.flush();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			Utils.safeClose(oos);
-		}
 	}
 
 	private Task updateTasksGameWorld(Task task) {
