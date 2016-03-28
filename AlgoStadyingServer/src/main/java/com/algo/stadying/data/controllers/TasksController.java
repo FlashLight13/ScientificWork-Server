@@ -2,7 +2,9 @@ package com.algo.stadying.data.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import com.algo.stadying.Utils;
 import com.algo.stadying.data.entities.Task;
 import com.algo.stadying.data.entities.TaskGroup;
+import com.algo.stadying.data.entities.User;
 import com.algo.stadying.data.repositories.TaskGroupsRepository;
 import com.algo.stadying.data.repositories.TaskRepository;
 import com.algo.stadying.errors.ValidationException;
@@ -33,16 +36,30 @@ public class TasksController {
 		String[][][] gameField = task.getGameField();
 		task.setGameField(null);
 		task = taskRepository.save(task);
-		taskCreationSubcontroller.saveGameWorld(task.getId(), gameField);
+		saveGameWorld(task.getId(), gameField);
 
 		if (taskGroupRepository.exists(taskGroup.getId())) {
 			taskGroup = taskCreationSubcontroller.updateTaskGroup(taskGroup, task);
 		} else {
 			taskGroup = taskCreationSubcontroller.createTaskGroup(taskGroup, task);
 		}
+		taskCreationSubcontroller.updateUsers(users, taskGroup);
 		return new WorldData(taskGroup, task, users);
 	}
 
+	public void saveGameWorld(long taskId, String[][][] gameWorld) {
+		ObjectOutputStream oos = null;
+		try {
+			oos = new ObjectOutputStream(new FileOutputStream(new File(String.valueOf(taskId))));
+			oos.writeObject(gameWorld);
+			oos.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			Utils.safeClose(oos);
+		}
+	}
+	
 	private Task updateTasksGameWorld(Task task) {
 		ObjectInputStream ois = null;
 		try {
@@ -106,11 +123,24 @@ public class TasksController {
 		return updateTasksGameWorld(task);
 	}
 
-	public Iterable<TaskGroup> getTaskGroups() {
-		return taskGroupRepository.findAll();
+	public Iterable<TaskGroup> getTaskGroups(User user) {
+		User existedUser = playerController.findPlayer(user.getLogin());
+		return existedUser.getTaskGroups();
 	}
 
 	public void removeTaskGroup(Long id) {
-		taskGroupRepository.delete(id);
+		if (taskGroupRepository.exists(id)) {
+			TaskGroup taskGroup = taskGroupRepository.findOne(id);
+			for (Task task : taskGroup.getTasks()) {
+				removeTask(task.getId());
+			}
+			taskGroupRepository.delete(id);
+		}
+	}
+
+	public void removeTask(Long id) {
+		if (taskRepository.exists(id)) {
+			taskRepository.delete(id);
+		}
 	}
 }

@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algo.stadying.Utils;
 import com.algo.stadying.data.controllers.TasksController;
 import com.algo.stadying.data.entities.Task;
 import com.algo.stadying.data.entities.TaskGroup;
@@ -28,13 +30,19 @@ public class TasksProcessor {
 	}
 
 	@RequestMapping(value = "/getTaskGroupsNames")
-	public ResponseEntity<Iterable<TaskGroup>> getTaskGroupsNames() {
-		return new ResponseEntity<Iterable<TaskGroup>>(tasksController.getTaskGroups(), HttpStatus.OK);
+	public ResponseEntity<Iterable<TaskGroup>> getTaskGroupsNames(@RequestHeader("Authentication") byte[] authData) {
+		return new ResponseEntity<Iterable<TaskGroup>>(tasksController.getTaskGroups(Utils.parseAuthHeader(authData)),
+				HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/removeTaskGroup")
 	public void removeTaskGroup(@RequestBody Map<String, String> request) {
 		tasksController.removeTaskGroup(Long.parseLong(request.get("id")));
+	}
+
+	@RequestMapping(value = "/removeTask")
+	public void removeTask(@RequestBody Map<String, String> request) {
+		tasksController.removeTask(Long.parseLong(request.get("id")));
 	}
 
 	@RequestMapping(value = "/task")

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Controller;
 
 import com.algo.stadying.data.entities.TaskGroup;
 import com.algo.stadying.data.entities.User;
-import com.algo.stadying.data.entities.User.Type;
 import com.algo.stadying.data.repositories.PlayerRepository;
 import com.algo.stadying.errors.AuthException;
 import com.algo.stadying.errors.ValidationException;
@@ -17,26 +16,26 @@ public class PlayerController {
 	@Autowired
 	PlayerRepository repository;
 
-	public User login(String login, String pass) throws AuthException {
-		User player = repository.findOne(login);
+	public User login(User user) throws AuthException {
+		User player = repository.findOne(user.getLogin());
 		if (player == null) {
 			throw AuthException.noSuchUser();
 		}
-		if (player.getPass().equals(pass)) {
+		if (player.getPass().equals(user.getPass())) {
 			return player;
 		} else {
 			throw AuthException.wrongPass();
 		}
 	}
 
-	public User register(String login, String password, String name, Type type) throws ValidationException {
-		User player = repository.findOne(login);
+	public User register(User newUser) throws ValidationException {
+		User player = repository.findOne(newUser.getLogin());
 		if (player != null) {
 			throw ValidationException.userAlreadyExists();
 		}
-		player = new User(login, password);
-		player.setType(type);
-		player.setName(name);
+		player = new User(newUser.getLogin(), newUser.getPass());
+		player.setType(newUser.getType());
+		player.setName(newUser.getName());
 		repository.save(player);
 		return player;
 	}
@@ -85,5 +84,9 @@ public class PlayerController {
 
 	public Iterable<User> findPlayers() {
 		return repository.findAll();
+	}
+	
+	public Iterable<User> findStudents() {
+		return repository.findAllStudents();
 	}
 }

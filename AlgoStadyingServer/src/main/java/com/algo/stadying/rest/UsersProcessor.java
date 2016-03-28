@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algo.stadying.Utils;
 import com.algo.stadying.data.controllers.PlayerController;
 import com.algo.stadying.data.entities.User;
 import com.algo.stadying.errors.AuthException;
@@ -20,15 +21,11 @@ public class UsersProcessor {
 
 	@Autowired
 	PlayerController controller;
-	public static final String DIVIDER = "%";
 
 	@RequestMapping(value = "/login")
 	synchronized public ResponseEntity<Object> auth(@RequestHeader("Authentication") byte[] authData) {
 		try {
-			String authString = new String(org.apache.tomcat.util.codec.binary.Base64.decodeBase64(authData));
-			String login = authString.substring(0, authString.indexOf(DIVIDER));
-			String password = authString.substring(login.length() + 1);
-			return new ResponseEntity<Object>(controller.login(login, password), HttpStatus.OK);
+			return new ResponseEntity<Object>(controller.login(Utils.parseAuthHeader(authData)), HttpStatus.OK);
 		} catch (AuthException e) {
 			return new ResponseEntity<Object>(e.type.name(), e.status);
 		} catch (Exception e) {
@@ -39,13 +36,11 @@ public class UsersProcessor {
 	@RequestMapping(value = "/register")
 	synchronized public ResponseEntity<Object> register(@RequestHeader("Authentication") byte[] authData,
 			@RequestBody Map<String, String> request) {
-		String authString = new String(org.apache.tomcat.util.codec.binary.Base64.decodeBase64(authData));
-		String login = authString.substring(0, authString.indexOf(DIVIDER));
-		String password = authString.substring(login.length() + 1);
 		try {
-			return new ResponseEntity<Object>(
-					controller.register(login, password, request.get("name"), User.Type.valueOf(request.get("type"))),
-					HttpStatus.OK);
+			User newUser = Utils.parseAuthHeader(authData);
+			newUser.setName(request.get("name"));
+			newUser.setType(User.Type.valueOf(request.get("type")));
+			return new ResponseEntity<Object>(controller.register(newUser), HttpStatus.OK);
 		} catch (ValidationException e) {
 			return new ResponseEntity<Object>(e.type.name(), e.status);
 		} catch (Exception e) {
@@ -53,12 +48,12 @@ public class UsersProcessor {
 		}
 	}
 
-	@RequestMapping("/get_users")
-	synchronized public ResponseEntity<Object> getUsers() {
-		return new ResponseEntity<Object>(controller.findPlayers(), HttpStatus.OK);
+	@RequestMapping("/getStudents")
+	synchronized public ResponseEntity<Object> getStudents() {
+		return new ResponseEntity<Object>(controller.findStudents(), HttpStatus.OK);
 	}
 
-	@RequestMapping("/update_user")
+	@RequestMapping("/updateUser")
 	public ResponseEntity<Object> updateUser(@RequestBody Map<String, String> request) {
 		User player = controller.findPlayer(request.get("login"));
 		if (player != null) {
@@ -70,7 +65,7 @@ public class UsersProcessor {
 		return new ResponseEntity<Object>(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	@RequestMapping("/remove_user")
+	@RequestMapping("/removeUser")
 	synchronized public ResponseEntity<Object> removeUser(@RequestBody Map<String, String> request) {
 		controller.remove(request.get("login"));
 		return new ResponseEntity<Object>(HttpStatus.OK);
