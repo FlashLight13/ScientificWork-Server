@@ -9,8 +9,5 @@
     <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
     <!-- Enable this to see the SQL statements in the logs-->
     <property name="show_sql">false</property>
-    <!-- This will drop our existing database and re-create a new one.
-      Existing data will be deleted! -->
-    <property name="hbm2ddl.auto">validate</property>
   </session-factory>
 </hibernate-configuration>

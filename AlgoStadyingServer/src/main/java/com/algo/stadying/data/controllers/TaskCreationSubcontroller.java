@@ -54,7 +54,6 @@ public class TaskCreationSubcontroller {
 		}
 	}
 
-	@Transactional
 	private void updateUserTaskGroup(User user, TaskGroup taskGroup) {
 		if (!containsTaskGroup(user.getTaskGroups(), taskGroup)) {
 			List<TaskGroup> taskGroups = user.getTaskGroups();
@@ -63,7 +62,6 @@ public class TaskCreationSubcontroller {
 		}
 	}
 
-	@Transactional
 	private void removeTaskGroupFromUser(User user, TaskGroup taskGroup) {
 		Iterator<TaskGroup> i = user.getTaskGroups().iterator();
 		while (i.hasNext()) {

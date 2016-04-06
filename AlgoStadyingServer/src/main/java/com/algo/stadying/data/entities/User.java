@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -16,13 +16,14 @@ public class User {
 	public enum Type {
 		ADMIN, STUDENT
 	}
-
-	private @Id String login;
+	
+	@Id
+	private String login;
 	private String pass;
 
-	@OneToMany
+	@ManyToMany
 	private List<Stats> stats;
-	@OneToMany
+	@ManyToMany
 	private List<TaskGroup> taskGroups;
 	private String name;
 	@Enumerated(EnumType.STRING)
