@@ -23,6 +23,8 @@ import com.algo.stadying.rest.TasksProcessor.WorldData;
 
 @Controller
 public class TasksController {
+	private static final String MAPS_DIR = "game_maps/";
+
 	@Autowired
 	TaskRepository taskRepository;
 	@Autowired
@@ -50,7 +52,8 @@ public class TasksController {
 	public void saveGameWorld(long taskId, String[][][] gameWorld) {
 		ObjectOutputStream oos = null;
 		try {
-			oos = new ObjectOutputStream(new FileOutputStream(new File(String.valueOf(taskId))));
+			checkMapsDir();
+			oos = new ObjectOutputStream(new FileOutputStream(new File(MAPS_DIR + String.valueOf(taskId))));
 			oos.writeObject(gameWorld);
 			oos.flush();
 		} catch (Exception e) {
@@ -59,11 +62,16 @@ public class TasksController {
 			Utils.safeClose(oos);
 		}
 	}
-	
+
+	private void checkMapsDir() {
+		new File(MAPS_DIR).mkdirs();
+	}
+
 	private Task updateTasksGameWorld(Task task) {
 		ObjectInputStream ois = null;
 		try {
-			ois = new ObjectInputStream(new FileInputStream(new File(String.valueOf(task.getId()))));
+			checkMapsDir();
+			ois = new ObjectInputStream(new FileInputStream(new File(MAPS_DIR + String.valueOf(task.getId()))));
 			task.setGameField((String[][][]) ois.readObject());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -139,6 +147,8 @@ public class TasksController {
 	}
 
 	public void removeTask(Long id) {
+		List<TaskGroup> taskGroups = (List<TaskGroup>) taskGroupRepository.findAll();
+
 		if (taskRepository.exists(id)) {
 			taskRepository.delete(id);
 		}

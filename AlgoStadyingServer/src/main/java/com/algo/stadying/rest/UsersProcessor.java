@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algo.stadying.Utils;
 import com.algo.stadying.data.controllers.PlayerController;
+import com.algo.stadying.data.entities.Stats;
 import com.algo.stadying.data.entities.User;
 import com.algo.stadying.errors.AuthException;
 import com.algo.stadying.errors.ValidationException;
@@ -69,5 +70,15 @@ public class UsersProcessor {
 	synchronized public ResponseEntity<Object> removeUser(@RequestBody Map<String, String> request) {
 		controller.remove(request.get("login"));
 		return new ResponseEntity<Object>(HttpStatus.OK);
+	}
+
+	@RequestMapping("/update_stats")
+	synchronized public void updateStats() {
+		
+	}
+	
+	@RequestMapping("/load_stats")
+	synchronized public ResponseEntity<Stats> loadStats() {
+		return null;
 	}
 }
