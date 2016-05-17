@@ -1,5 +1,6 @@
 package com.algo.stadying.rest;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algo.stadying.Utils;
 import com.algo.stadying.data.controllers.PlayerController;
-import com.algo.stadying.data.entities.Stats;
+import com.algo.stadying.data.controllers.StatsController;
+import com.algo.stadying.data.entities.Stat;
 import com.algo.stadying.data.entities.User;
 import com.algo.stadying.errors.AuthException;
 import com.algo.stadying.errors.ValidationException;
@@ -22,6 +24,8 @@ public class UsersProcessor {
 
 	@Autowired
 	PlayerController controller;
+	@Autowired
+	StatsController statsController;
 
 	@RequestMapping(value = "/login")
 	synchronized public ResponseEntity<Object> auth(@RequestHeader("Authentication") byte[] authData) {
@@ -73,12 +77,21 @@ public class UsersProcessor {
 	}
 
 	@RequestMapping("/update_stats")
-	synchronized public void updateStats() {
-		
+	synchronized public ResponseEntity<Stat>  updateStats(@RequestHeader("Authentication") byte[] authData,
+			@RequestBody Stat stat) {
+		User user = controller.findPlayer(Utils.parseAuthHeader(authData).getLogin());
+		stat = statsController.save(stat);
+		user.getStats().add(stat);
+		controller.save(user);
+		return new ResponseEntity<Stat>(stat, HttpStatus.OK);
 	}
-	
+
 	@RequestMapping("/load_stats")
-	synchronized public ResponseEntity<Stats> loadStats() {
-		return null;
+	synchronized public ResponseEntity<List<Stat>> loadStats(@RequestBody Map<String, String> request) {
+		User user = controller.findPlayer(request.get("login"));
+		if (user == null) {
+			return new ResponseEntity<List<Stat>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return new ResponseEntity<List<Stat>>(user.getStats(), HttpStatus.OK);
 	}
 }

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.algo.stadying.data.entities.Stats;
+import com.algo.stadying.data.entities.Stat;
 import com.algo.stadying.data.entities.User;
 import com.algo.stadying.data.entities.User.Type;
 import com.algo.stadying.data.repositories.PlayerRepository;
@@ -25,7 +25,7 @@ public class AlgoStadyingServerApplication {
 
 	@PostConstruct
 	private void init() {
-		User admin = new User("admin", "admin", new ArrayList<Stats>(), "Administrator", Type.ADMIN);
+		User admin = new User("admin", "admin", new ArrayList<Stat>(), "Administrator", Type.ADMIN);
 		playerRepository.save(admin);
 	}
 }

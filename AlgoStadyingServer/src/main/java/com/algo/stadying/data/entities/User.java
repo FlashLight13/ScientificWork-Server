@@ -22,7 +22,7 @@ public class User {
 	private String pass;
 
 	@ManyToMany
-	private List<Stats> stats;
+	private List<Stat> stats;
 	@ManyToMany
 	private List<TaskGroup> taskGroups;
 	private String name;
@@ -33,7 +33,7 @@ public class User {
 
 	}
 
-	public User(String login, String pass, List<Stats> stats, String name, Type type) {
+	public User(String login, String pass, List<Stat> stats, String name, Type type) {
 		super();
 		this.login = login;
 		this.pass = pass;
@@ -48,11 +48,11 @@ public class User {
 		this.pass = pass;
 	}
 
-	public List<Stats> getStats() {
+	public List<Stat> getStats() {
 		return stats;
 	}
 
-	public void setStats(List<Stats> stats) {
+	public void setStats(List<Stat> stats) {
 		this.stats = stats;
 	}
 

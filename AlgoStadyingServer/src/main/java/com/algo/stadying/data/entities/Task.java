@@ -15,9 +15,9 @@ public class Task {
 	@Column(name = "id")
 	private Long id;
 	private String title;
-
-	private String[][][] gameField;
 	private String description;
+	
+	private transient String[][][] gameField;
 
 	public Task() {
 	}
